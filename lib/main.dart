@@ -1,85 +1,232 @@
-//
-// import 'package:flutter/material.dart';
-//
-// class TextFieldListView extends StatefulWidget {
-//   @override
-//   _TextFieldListViewState createState() => _TextFieldListViewState();
-// }
-//
-// class _TextFieldListViewState extends State<TextFieldListView> {
-//   List<String> textFields = ['Text Field 1', 'Text Field 2', 'Text Field 3', 'Text Field 4', 'Text Field 5'];
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('Editable Text Fields'),
-//       ),
-//       body: ListView.builder(
-//         itemCount: textFields.length,
-//         itemBuilder: (context, index) {
-//           return ListTile(
-//             title: TextFormField(
-//               initialValue: textFields[index],
-//               onChanged: (value) {
-//                 textFields[index] = value;
-//               },
-//             ),
-//           );
-//         },
-//       ),
-//     );
-//   }
-// }
-//
-// void main() {
-//   runApp(MaterialApp(
-//     home: TextFieldListView(),
-//   ));
-// }
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
-class TextFieldListView extends StatefulWidget {
+
+class ProfilePage extends StatefulWidget {
+  const ProfilePage({Key? key}) : super(key: key);
+
   @override
-  _TextFieldListViewState createState() => _TextFieldListViewState();
+  State<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _TextFieldListViewState extends State<TextFieldListView> {
-  List<String> textFields = ['Text Field 1', 'Text Field 2', 'Text Field 3', 'Text Field 4', 'Text Field 5'];
+class _ProfilePageState extends State<ProfilePage> {
+  bool isObscurePassword = true;
+  File? _imageFile;
+  String? id;
+  String? fullName;
+  String? email;
+  String? password;
+
+  Future<void> _pickImage() async {
+    final pickedImage =
+    await ImagePicker().getImage(source: ImageSource.gallery);
+
+    if (pickedImage != null) {
+      setState(() {
+        _imageFile = File(pickedImage.path);
+      });
+    }
+  }
+
+  void submitForm() {
+    print('ID: $id');
+    print('Full Name: $fullName');
+    print('Email: $email');
+    print('Password: $password');
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Editable Text Fields'),
+        backgroundColor: Colors.white,
+        title: const Text(
+          "Profile Edit",
+          style: TextStyle(color: Colors.black, fontSize: 22),
+        ),
+        // leading: IconButton(
+        //   icon: Image.asset("images/back.png"),
+        //   onPressed: () {
+        //     Navigator.push(
+        //         context, MaterialPageRoute(builder: (context) => HomePage()));
+        //   },
+        // ),
+        elevation: 0.0,
       ),
-      body: ListView.builder(
-        itemCount: textFields.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Stack(
-              alignment: Alignment.bottomRight,
-              children: [
-                TextFormField(
-                  initialValue: textFields[index],
-                  onChanged: (value) {
-                    setState(() {
-                      textFields[index] = value;
-                    });
-                  },
+      body: Container(
+        padding: const EdgeInsets.only(left: 15, top: 20, right: 15),
+        child: GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          child: ListView(
+            children: [
+              Center(
+                child: Stack(
+                  children: [
+                    Container(
+                      width: 130,
+                      height: 130,
+                      decoration: BoxDecoration(
+                        border: Border.all(width: 4, color: Colors.white),
+                        boxShadow: [
+                          BoxShadow(
+                            spreadRadius: 2,
+                            blurRadius: 10,
+                            color: Colors.black.withOpacity(0.1),
+                          )
+                        ],
+                        shape: BoxShape.circle,
+                        image: _imageFile != null
+                            ? DecorationImage(
+                          fit: BoxFit.cover,
+                          image: FileImage(_imageFile!),
+                        )
+                            : const DecorationImage(
+                          fit: BoxFit.cover,
+                          image: NetworkImage(
+                              'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png'),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: GestureDetector(
+                        onTap: _pickImage,
+                        child: Container(
+                          height: 40,
+                          width: 40,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(width: 4, color: Colors.white),
+                            color: Colors.blue,
+                          ),
+                          child: const Icon(
+                            Icons.edit,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                Icon(Icons.arrow_forward, color: Colors.grey),
-              ],
-            ),
-          );
-        },
+              ),
+              const SizedBox(
+                height: 30,
+              ),
+              buildTextField("ID", "Enter ID Number", false, 18),
+              buildTextField("Full Name", "Enter Full Name", false, 18),
+              buildTextField("Email", "Enter Your Email", false, 18),
+              buildTextField("Password", "Enter Password", true, 18),
+              const SizedBox(height: 50),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {},
+                    child: const Text("Cancel",
+                        style: TextStyle(
+                            fontSize: 15,
+                            letterSpacing: 2,
+                            color: Colors.white)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      padding: const EdgeInsets.symmetric(horizontal: 50),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: submitForm,
+                    child: const Text("Submit",
+                        style: TextStyle(
+                            fontSize: 15,
+                            letterSpacing: 2,
+                            color: Colors.white)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      padding: const EdgeInsets.symmetric(horizontal: 50),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
       ),
     );
   }
-}
 
-void main() {
-  runApp(MaterialApp(
-    home: TextFieldListView(),
-  ));
+  Widget buildTextField(
+      String labelText,
+      String placeholder,
+      bool isPasswordTextField,
+      double fontSize,
+      ) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 30),
+      child: TextField(
+        obscureText: isPasswordTextField ? isObscurePassword : false,
+        onChanged: (value) {
+          setState(() {
+            switch (labelText) {
+              case "ID":
+                id = value;
+                break;
+              case "Full Name":
+                fullName = value;
+                break;
+              case "Email":
+                email = value;
+                break;
+              case "Password":
+                password = value;
+                break;
+            }
+          });
+        },
+        decoration: InputDecoration(
+          suffixIcon: isPasswordTextField
+              ? IconButton(
+            icon: isObscurePassword
+                ? const Icon(
+              Icons.visibility_off,
+              color: Colors.grey,
+            )
+                : const Icon(
+              //Icons.visibility_off,
+              Icons.remove_red_eye,
+              color: Colors.grey,
+            ),
+            onPressed: () {
+              setState(() {
+                isObscurePassword = !isObscurePassword;
+              });
+            },
+          )
+              : null,
+          contentPadding: const EdgeInsets.only(bottom: 5),
+          labelText: labelText,
+          floatingLabelBehavior: FloatingLabelBehavior.always,
+          hintText: placeholder,
+          hintStyle: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey,
+          ),
+          labelStyle: const TextStyle(
+            fontSize: 20, // font size
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+      ),
+    );
+  }
 }
