@@ -45,13 +45,14 @@ class _ProfilePageState extends State<ProfilePage> {
           "Profile Edit",
           style: TextStyle(color: Colors.black, fontSize: 22),
         ),
-        // leading: IconButton(
-        //   icon: Image.asset("images/back.png"),
-        //   onPressed: () {
-        //     Navigator.push(
-        //         context, MaterialPageRoute(builder: (context) => HomePage()));
-        //   },
-        // ),
+        leading: IconButton(
+          icon: Image.asset("images/back.png"),
+          onPressed: () {
+            Navigator.push(
+              
+                context, MaterialPageRoute(builder: (context) => HomePage()));
+          },
+        ),
         elevation: 0.0,
       ),
       body: Container(
@@ -229,4 +230,7 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
+}
+
+class HomePage {
 }
